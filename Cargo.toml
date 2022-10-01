@@ -5,6 +5,9 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[profile.release]
+strip="debuginfo"
+
 [dependencies]
 eframe = { version = "0.19", features = ["wgpu"] }
 gmi = "0.2"
