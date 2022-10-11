@@ -12,3 +12,4 @@ strip="debuginfo"
 eframe = { version = "0.19", features = ["wgpu"] }
 gmi = "0.2"
 url = "2.3"
+argh = "0.1"

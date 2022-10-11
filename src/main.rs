@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use argh::FromArgs;
 use eframe::{
     egui::{self, containers::Frame, output::OpenUrl, style::Margin, RichText, ScrollArea},
     epaint::Color32,
@@ -13,6 +14,7 @@ use gmi::{
 };
 
 use std::{
+    ffi::OsStr,
     path::PathBuf,
     str,
     sync::{
@@ -22,16 +24,22 @@ use std::{
     thread,
 };
 
+const DEFAULT_STARTING_PAGE: &'static str = "gemini://gemini.circumlunar.space";
+
 fn main() {
     let mut options = NativeOptions::default();
 
     options.renderer = Renderer::Wgpu;
 
-    eframe::run_native(
-        "gbrowse",
-        options,
-        Box::new(|_cc| Box::new(Gbrowse::default())),
-    );
+    eframe::run_native("gbrowse", options, Box::new(|_cc| Box::new(Gbrowse::new())));
+}
+
+#[derive(FromArgs)]
+/// A simple gemini browser.
+struct GbrowseArgs {
+    /// what page to start on
+    #[argh(option, short = 'p')]
+    page: Option<String>,
 }
 
 struct Gbrowse {
@@ -44,11 +52,11 @@ struct Gbrowse {
     url: String,
 }
 
-impl Default for Gbrowse {
-    fn default() -> Self {
-        let (tx, rx) = mpsc::channel();
+impl Gbrowse {
+    pub fn new() -> Self {
+        let args: GbrowseArgs = argh::from_env();
 
-        let starting_page = "gemini://gemini.circumlunar.space";
+        let (tx, rx) = mpsc::channel();
 
         Self {
             tx,
@@ -57,12 +65,10 @@ impl Default for Gbrowse {
             content: None,
             error: None,
             loading: false,
-            url: starting_page.to_string(),
+            url: args.page.unwrap_or(DEFAULT_STARTING_PAGE.to_string()),
         }
     }
-}
 
-impl Gbrowse {
     pub fn change_site(&mut self, url: &str, moving_back: bool) {
         self.error = None;
         self.content = None;
@@ -201,6 +207,12 @@ impl eframe::App for Gbrowse {
                                             if url_addition_path.is_absolute() {
                                                 current_path = url_addition_path;
                                             } else {
+                                                if url_addition_path.extension()
+                                                    == Some(OsStr::new("gmi"))
+                                                {
+                                                    current_path.pop();
+                                                }
+
                                                 current_path.push(url_addition_path);
                                             }
 
@@ -247,11 +259,10 @@ impl eframe::App for Gbrowse {
                     });
             }
         });
-        
+
         if self.loading {
             ctx.request_repaint();
         }
-
     }
 }
 
