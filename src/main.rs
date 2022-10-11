@@ -197,29 +197,27 @@ impl eframe::App for Gbrowse {
                                             }
                                         } else {
                                             // if relative url
-                                            let mut current_url =
+                                            let mut new_url =
                                                 url::Url::parse(&self.url.clone()).unwrap();
-                                            let mut current_path =
-                                                PathBuf::from(current_url.path());
+                                            let mut new_path =
+                                                PathBuf::from(new_url.path());
 
-                                            let url_addition_path = PathBuf::from(url.clone());
+                                            let addition = PathBuf::from(url.clone());
 
-                                            if url_addition_path.is_absolute() {
-                                                current_path = url_addition_path;
+                                            if addition.is_absolute() {
+                                                new_path = addition;
                                             } else {
-                                                if url_addition_path.extension()
-                                                    == Some(OsStr::new("gmi"))
-                                                {
-                                                    current_path.pop();
+                                                if addition.extension() == Some(OsStr::new("gmi")) {
+                                                    new_path.pop();
                                                 }
 
-                                                current_path.push(url_addition_path);
+                                                new_path.push(addition);
                                             }
 
-                                            current_url.set_path(
-                                                current_path.to_str().unwrap_or_default(),
+                                            new_url.set_path(
+                                                new_path.to_str().unwrap_or_default(),
                                             );
-                                            self.change_site(current_url.as_str(), false);
+                                            self.change_site(new_url.as_str(), false);
                                         }
                                     }
                                 }
