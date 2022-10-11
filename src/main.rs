@@ -121,7 +121,7 @@ impl Gbrowse {
 }
 
 impl eframe::App for Gbrowse {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _fame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             // get content back from other thread
             if let Some(content) = self.get_content() {
@@ -247,6 +247,11 @@ impl eframe::App for Gbrowse {
                     });
             }
         });
+        
+        if self.loading {
+            ctx.request_repaint();
+        }
+
     }
 }
 
