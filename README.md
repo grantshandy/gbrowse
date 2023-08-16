@@ -7,13 +7,3 @@ Personally I think the gemini project itself is kind of a gimmick, but some frie
 It's not a masterpiece but I think it works quite well for the amount of time I put into it (~3hrs) and the number of SLOC (~200).
 
 ![screenshot](./screenshots/screenshot.png)
-
-## build
-```
-$ cargo build
-```
-
-## run
-```
-$ cargo run
-```
